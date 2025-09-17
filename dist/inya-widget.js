@@ -142,6 +142,11 @@ class InyaTranscript extends HTMLElement {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
+  renderError(error) {
+    const chatContainer = this.shadowRoot.getElementById('chat-container');
+    chatContainer.innerHTML = `<div class="error-message">${error}</div>`;
+  }
+
   getReadableTimestamp(timestamp) {
     const date = new Date(timestamp * 1000);
     return date.toLocaleString();
@@ -176,7 +181,7 @@ class InyaTranscript extends HTMLElement {
       return
     }
     
-    fetch(`https://68c96696ceef5a150f64b6fa.mockapi.io/inya/transcript/1`, {
+    fetch(`https://genvoice-appdevbk.gnani.site/cisco_webex/get_transcript_cisco/${conversationId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -189,6 +194,7 @@ class InyaTranscript extends HTMLElement {
     })
     .catch(error => {
       console.error("Failed to fetch transcript", error);
+      this.renderError("We are not able to fetch the transcript at the moment. Please try again later.");
     });
   }
 
