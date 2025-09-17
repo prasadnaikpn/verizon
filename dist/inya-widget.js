@@ -166,13 +166,18 @@ class InyaTranscript extends HTMLElement {
   //   return messages;
   // }
 
+  getReadableTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  }
+
   createMessageElement(message) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.role}`;
     
     const headerDiv = document.createElement('div');
     headerDiv.className = 'message-header';
-    headerDiv.textContent = `${message.role.charAt(0).toUpperCase() + message.role.slice(1)} • ${message.timestamp}`;
+    headerDiv.textContent = `${message.role.charAt(0).toUpperCase() + message.role.slice(1)} • ${this.getReadableTimestamp(message.timestamp)}`;
     
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'message-bubble';
