@@ -189,7 +189,7 @@ class InyaTranscript extends HTMLElement {
     const [_, conversationId] = window.location.pathname.split('/task/');
     console.log("Prasad Check this", {conversationId});
 
-    if(conversationId){
+    if(!conversationId){
       return
     }
 
@@ -221,8 +221,9 @@ class InyaTranscript extends HTMLElement {
     console.log("Prasad Check this", "loadData");
     this.fetchTranscript()
     const content = this.shadowRoot.getElementById('content');
-    content.innerText = "Please wait while we load the transcript...";
-    
+    if(content){
+      content.innerText = "Please wait while we load the transcript...";
+    }
   }
 }
 
