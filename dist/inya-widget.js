@@ -117,14 +117,6 @@ class InyaTranscript extends HTMLElement {
     this.shadowRoot.host.style.color = value ? "#fff" : "#000";
   }
 
-  set selectedTaskId(value) {
-    this._selectedTaskId = value;
-  }
-
-  get selectedTaskId() {
-    return this._selectedTaskId;
-  }
-
   set accessToken(value) {
     this._accessToken = value;
   }
@@ -183,8 +175,6 @@ class InyaTranscript extends HTMLElement {
     if(!conversationId){
       return
     }
-
-    console.log("Prasad Check this", {conversationId, selectedTaskId: this.selectedTaskId || 'yet_to_be_set', accessToken: this.accessToken || 'yet_to_be_set'});
     
     fetch(`https://68c96696ceef5a150f64b6fa.mockapi.io/inya/transcript/1`, {
       method: 'GET',
