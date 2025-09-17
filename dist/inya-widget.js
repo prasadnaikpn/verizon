@@ -142,33 +142,13 @@ class InyaTranscript extends HTMLElement {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  // parseTranscriptText(text) {
-  //   const messages = [];
-  //   const lines = text.split('\n');
-    
-  //   lines.forEach(line => {
-  //     const trimmedLine = line.trim();
-  //     if (!trimmedLine) return;
-      
-  //     // Match pattern: [timestamp] Speaker: message
-  //     const match = trimmedLine.match(/^\[([^\]]+)\]\s+(Assistant|User):\s+(.+)$/);
-      
-  //     if (match) {
-  //       const [, timestamp, speaker, message] = match;
-  //       messages.push({
-  //         timestamp: timestamp,
-  //         speaker: speaker.toLowerCase(),
-  //         message: message
-  //       });
-  //     }
-  //   });
-    
-  //   return messages;
-  // }
-
   getReadableTimestamp(timestamp) {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp * 1000);
     return date.toLocaleString();
+  }
+
+  capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
   createMessageElement(message) {
@@ -177,7 +157,7 @@ class InyaTranscript extends HTMLElement {
     
     const headerDiv = document.createElement('div');
     headerDiv.className = 'message-header';
-    headerDiv.textContent = `${message.role.charAt(0).toUpperCase() + message.role.slice(1)} • ${this.getReadableTimestamp(message.timestamp)}`;
+    headerDiv.textContent = `${this.capitalizeFirstLetter(message.role)} • ${this.getReadableTimestamp(message.timestamp)}`;
     
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'message-bubble';
