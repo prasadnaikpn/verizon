@@ -117,30 +117,17 @@ class InyaTranscript extends HTMLElement {
     this.shadowRoot.host.style.color = value ? "#fff" : "#000";
   }
 
-  set accessToken(value) {
-    console.log("Prasad Check this", "accessToken", value);
-    this.accessToken = value;
-  }
+  // set selectedTaskId(value) {
+  //   this.selectedTaskId = value;
+  // }
 
-  set session_transcript(value) {
-    console.log("Session transcript received:", value);
-    this.renderTranscript(value);
-  }
+  // set accessToken(value) {
+  //   this.accessToken = value;
+  // }
 
-  renderTranscript(transcriptData) {
+  renderTranscript(messages) {
     const chatContainer = this.shadowRoot.getElementById('chat-container');
     
-    if (!transcriptData || !transcriptData.text) {
-      chatContainer.innerHTML = `
-        <div style="text-align: center; color: #6c757d; padding: 20px;">
-          No transcript available yet
-        </div>
-      `;
-      return;
-    }
-
-    // Parse the transcript text
-    const messages = this.parseTranscriptText(transcriptData.text);
     
     // Clear the container
     chatContainer.innerHTML = '';
@@ -197,14 +184,45 @@ class InyaTranscript extends HTMLElement {
     return messageDiv;
   }
 
+  fetchTranscript() {
+    console.log("Prasad Check this", "fetchTranscript");
+    const [_, conversationId] = window.location.pathname.split('/task/');
+    console.log("Prasad Check this", {conversationId});
+
+    if(conversationId){
+      return
+    }
+
+    console.log("Prasad Check this", {conversationId, selectedTaskId: this.selectedTaskId || 'yet_to_be_set', accessToken: this.accessToken || 'yet_to_be_set'});
+
+    fetch(`https://68c96696ceef5a150f64b6fa.mockapi.io/inya/transcript/1`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.accessToken || 'yet_to_be_set'}`
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Prasad Check this", data);
+      this.renderTranscript(data.transcript);
+    })
+    .catch(error => {
+      console.error("Prasad Check this", error);
+    });
+  }
+
   connectedCallback() {
+    console.log("Prasad Check this", "connectedCallback");
     this.loadData();
   }
 
   async loadData() {
     console.log("Prasad Check this", "loadData");
+    this.fetchTranscript()
     const content = this.shadowRoot.getElementById('content');
-    content.innerText = "This is static content or can be replaced with properties passed from layout.json.";
+    content.innerText = "Please wait while we load the transcript...";
+    
   }
 }
 
