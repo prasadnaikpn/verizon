@@ -1,0 +1,211 @@
+class InyaTranscript extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.innerHTML = `
+      <style>
+        .widget-container {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          padding: 16px;
+          max-width: 100%;
+          height: 400px;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .widget-title {
+          margin: 0 0 16px 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+        }
+        
+        .chat-container {
+          flex: 1;
+          overflow-y: auto;
+          border: 1px solid #e1e5e9;
+          border-radius: 8px;
+          padding: 12px;
+          background-color: #f8f9fa;
+          margin-bottom: 12px;
+        }
+        
+        .message {
+          margin-bottom: 12px;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .message-header {
+          font-size: 12px;
+          color: #6c757d;
+          margin-bottom: 4px;
+          font-weight: 500;
+        }
+
+        .message.user .message-header {
+          text-align: right;
+        }
+         
+        .message-bubble {
+          padding: 8px 12px;
+          border-radius: 12px;
+          max-width: 80%;
+          word-wrap: break-word;
+          line-height: 1.4;
+        }
+        
+        .message.assistant .message-bubble {
+          background-color: #007bff;
+          color: white;
+          align-self: flex-start;
+        }
+        
+        .message.user .message-bubble {
+          background-color: #e9ecef;
+          color: #333;
+          align-self: flex-end;
+        }
+        
+        .info-section {
+          margin-top: 8px;
+          font-size: 14px;
+          color: #666;
+        }
+        
+        .info-item {
+          margin-bottom: 4px;
+        }
+        
+        /* Scrollbar styling */
+        .chat-container::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .chat-container::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 3px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+        }
+      </style>
+      <div class="widget-container">
+        <h3 class="widget-title">Session Transcript</h3>
+        <div id="chat-container" class="chat-container">
+          <div style="text-align: center; color: #6c757d; padding: 20px;">
+            No transcript available yet
+          </div>
+        </div>
+        <div class="info-section">
+          <div id="agent" class="info-item"></div>
+          <div id="darkmode" class="info-item"></div>
+          <div id="callprocessingdetails" class="info-item"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  set darkMode(value) {
+    this.shadowRoot.host.style.background = value ? "#222" : "#fff";
+    this.shadowRoot.host.style.color = value ? "#fff" : "#000";
+  }
+
+  set accessToken(value) {
+    console.log("Prasad Check this", "accessToken", value);
+    this.accessToken = value;
+  }
+
+  set session_transcript(value) {
+    console.log("Session transcript received:", value);
+    this.renderTranscript(value);
+  }
+
+  renderTranscript(transcriptData) {
+    const chatContainer = this.shadowRoot.getElementById('chat-container');
+    
+    if (!transcriptData || !transcriptData.text) {
+      chatContainer.innerHTML = `
+        <div style="text-align: center; color: #6c757d; padding: 20px;">
+          No transcript available yet
+        </div>
+      `;
+      return;
+    }
+
+    // Parse the transcript text
+    const messages = this.parseTranscriptText(transcriptData.text);
+    
+    // Clear the container
+    chatContainer.innerHTML = '';
+    
+    // Render each message
+    messages.forEach(message => {
+      const messageElement = this.createMessageElement(message);
+      chatContainer.appendChild(messageElement);
+    });
+    
+    // Scroll to bottom
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  parseTranscriptText(text) {
+    const messages = [];
+    const lines = text.split('\n');
+    
+    lines.forEach(line => {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) return;
+      
+      // Match pattern: [timestamp] Speaker: message
+      const match = trimmedLine.match(/^\[([^\]]+)\]\s+(Assistant|User):\s+(.+)$/);
+      
+      if (match) {
+        const [, timestamp, speaker, message] = match;
+        messages.push({
+          timestamp: timestamp,
+          speaker: speaker.toLowerCase(),
+          message: message
+        });
+      }
+    });
+    
+    return messages;
+  }
+
+  createMessageElement(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${message.speaker}`;
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'message-header';
+    headerDiv.textContent = `${message.speaker.charAt(0).toUpperCase() + message.speaker.slice(1)} • ${message.timestamp}`;
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'message-bubble';
+    bubbleDiv.textContent = message.message;
+    
+    messageDiv.appendChild(headerDiv);
+    messageDiv.appendChild(bubbleDiv);
+    
+    return messageDiv;
+  }
+
+  connectedCallback() {
+    this.loadData();
+  }
+
+  async loadData() {
+    console.log("Prasad Check this", "loadData");
+    const content = this.shadowRoot.getElementById('content');
+    content.innerText = "This is static content or can be replaced with properties passed from layout.json.";
+  }
+}
+
+customElements.define('inya-transcript', InyaTranscript);
