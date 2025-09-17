@@ -142,41 +142,41 @@ class InyaTranscript extends HTMLElement {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  parseTranscriptText(text) {
-    const messages = [];
-    const lines = text.split('\n');
+  // parseTranscriptText(text) {
+  //   const messages = [];
+  //   const lines = text.split('\n');
     
-    lines.forEach(line => {
-      const trimmedLine = line.trim();
-      if (!trimmedLine) return;
+  //   lines.forEach(line => {
+  //     const trimmedLine = line.trim();
+  //     if (!trimmedLine) return;
       
-      // Match pattern: [timestamp] Speaker: message
-      const match = trimmedLine.match(/^\[([^\]]+)\]\s+(Assistant|User):\s+(.+)$/);
+  //     // Match pattern: [timestamp] Speaker: message
+  //     const match = trimmedLine.match(/^\[([^\]]+)\]\s+(Assistant|User):\s+(.+)$/);
       
-      if (match) {
-        const [, timestamp, speaker, message] = match;
-        messages.push({
-          timestamp: timestamp,
-          speaker: speaker.toLowerCase(),
-          message: message
-        });
-      }
-    });
+  //     if (match) {
+  //       const [, timestamp, speaker, message] = match;
+  //       messages.push({
+  //         timestamp: timestamp,
+  //         speaker: speaker.toLowerCase(),
+  //         message: message
+  //       });
+  //     }
+  //   });
     
-    return messages;
-  }
+  //   return messages;
+  // }
 
   createMessageElement(message) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${message.speaker}`;
+    messageDiv.className = `message ${message.role}`;
     
     const headerDiv = document.createElement('div');
     headerDiv.className = 'message-header';
-    headerDiv.textContent = `${message.speaker.charAt(0).toUpperCase() + message.speaker.slice(1)} • ${message.timestamp}`;
+    headerDiv.textContent = `${message.role.charAt(0).toUpperCase() + message.role.slice(1)} • ${message.timestamp}`;
     
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'message-bubble';
-    bubbleDiv.textContent = message.message;
+    bubbleDiv.textContent = message.content;
     
     messageDiv.appendChild(headerDiv);
     messageDiv.appendChild(bubbleDiv);
@@ -185,16 +185,12 @@ class InyaTranscript extends HTMLElement {
   }
 
   fetchTranscript() {
-    console.log("Prasad Check this", "fetchTranscript");
     const [_, conversationId] = window.location.pathname.split('/task/');
-    console.log("Prasad Check this", {conversationId});
 
     if(!conversationId){
       return
     }
-
-    console.log("Prasad Check this", {conversationId, selectedTaskId: this.selectedTaskId || 'yet_to_be_set', accessToken: this.accessToken || 'yet_to_be_set'});
-
+    
     fetch(`https://68c96696ceef5a150f64b6fa.mockapi.io/inya/transcript/1`, {
       method: 'GET',
       headers: {
@@ -204,21 +200,18 @@ class InyaTranscript extends HTMLElement {
     })
     .then(response => response.json())
     .then(data => {
-      console.log("Prasad Check this", data);
       this.renderTranscript(data.transcript);
     })
     .catch(error => {
-      console.error("Prasad Check this", error);
+      console.error("Failed to fetch transcript", error);
     });
   }
 
   connectedCallback() {
-    console.log("Prasad Check this", "connectedCallback");
     this.loadData();
   }
 
   async loadData() {
-    console.log("Prasad Check this", "loadData");
     this.fetchTranscript()
     const content = this.shadowRoot.getElementById('content');
     if(content){
