@@ -203,7 +203,10 @@ class InyaTranscript extends HTMLElement {
   }
 
   async loadData() {
-    this.fetchTranscript()
+    setTimeout(() => {
+      this.fetchTranscript()
+    }, 1000)
+    
     const content = this.shadowRoot.getElementById('content');
     if(content){
       content.innerText = "Please wait while we load the transcript...";
