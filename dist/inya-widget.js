@@ -117,6 +117,22 @@ class InyaTranscript extends HTMLElement {
     this.shadowRoot.host.style.color = value ? "#fff" : "#000";
   }
 
+  set agentId(value {
+    this._agentId = value;
+  }
+
+  get agentId(value {
+    return this._agentId;
+  }
+
+  set orgId(value {
+    this._orgId = value;
+  }
+
+  get orgId(value {
+    return this._orgId;
+  }
+
   set accessToken(value) {
     this._accessToken = value;
   }
@@ -185,7 +201,9 @@ class InyaTranscript extends HTMLElement {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.accessToken || 'yet_to_be_set'}`
+        'Authorization': `Bearer ${this.accessToken || 'yet_to_be_set'}`,
+        'agentId': this.agentId,
+        'orgId': this.orgId
       }
     })
     .then(response => response.json())
